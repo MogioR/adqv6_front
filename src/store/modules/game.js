@@ -18,6 +18,10 @@ export default {
         updateGamePhase({ commit, getters, dispatch }, newGamePhase) {
             commit('setGamePhase', newGamePhase)
         },
+        updatePlayersAnswers({ commit, getters, dispatch }, PlayersAnswers) {
+            commit('setGamePlayersAnswers', PlayersAnswers)
+            commit('updateLobbyPlayerScore', PlayersAnswers)
+        },
     },
     mutations: {
         setQuestion(state, newQuestion) {
@@ -38,6 +42,9 @@ export default {
         setGamePhase(state, gamePhase) {
             state.gamePhase = gamePhase
         },
+        setGamePlayersAnswers(state, playersAnswers) {
+            state.playersAnswers = playersAnswers
+        }
     },
     state: {
         timer: 0,
@@ -46,7 +53,8 @@ export default {
         answer: '?',
         gameSettings: {},
         gamePhase: 'question',
-        hints: []
+        hints: [],
+        playersAnswers: []
     },
     getters: {
         gameQuestion(state) {
@@ -69,6 +77,9 @@ export default {
         },
         gamePhase(state) {
             return state.gamePhase
-        }
+        },
+        playersAnswers(state) {
+            return state.playersAnswers
+        },
     }
 }

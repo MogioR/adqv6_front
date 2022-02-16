@@ -26,14 +26,15 @@
     <div class="gameInput-conteiner">
       <form class="gameInput" v-on:submit.prevent="enterAnswer(in_answer)">
         <input class="titleSearch" ref="titleSearch" type="text" placeholder="Аниме"  v-model="in_answer" v-on:input="requestHints(in_answer)" v-on:keyup.down="focus()">
-        <select class= "titleSelect" ref="hintSelector" name="answerSelect" size="5" v-if="showHints" v-model="selected" v-on:keyup.enter="enterAnswer(in_answer)">
+        <select class= "titleSelect" ref="hintSelector" name="answerSelect" size="5" v-if="showHints" v-model="selected" v-on:keyup.enter="enterAnswer(in_answer)" v-on:click="enterAnswer(in_answer)">
           <option v-for="hint of gameHints" :key="hint.id">{{hint}}</option>
         </select>
       </form>
     </div>
     <div class="playersBar">
-        <div class="playerBarElement" v-for="player of lobbyPlayersList" :key="player.id">
+        <div class="playerBarElement" v-for="(player, index) of lobbyPlayersList" :key="player.id" :class="getAnswerClass(index)">
           <div class="playerBarElementAvatar">
+            <span class="titleDescription">{{playersAnswers[index]['answer']}}</span>
           </div>
           <div class="playerBarElementScore">
             <span class="titleDescription">{{player.score}}</span>
@@ -53,7 +54,7 @@
 import { mapGetters, mapActions } from "vuex";
 export default {
   name: 'Game',
-  computed: mapGetters(["gameQuestion", "gameAnswer", "gameHints", "questionType", "gameSettings", "gamePhase", "lobbyPlayersList"]),
+  computed: mapGetters(["gameQuestion", "gameAnswer", "gameHints", "questionType", "gameSettings", "gamePhase", "lobbyPlayersList", "playersAnswers"]),
   data() {
     return {
       roundCount: 1,
@@ -87,16 +88,30 @@ export default {
           this.$refs.hintSelector.focus();
           this.$refs.hintSelector.options[0].selected = true;
           this.$refs.hintSelector.selectedIndex = 0;
+          this.in_answer = this.$refs.hintSelector.value;
         }
       }
+    },
+    getAnswerClass(index) {
+      console.log(this.playersAnswers)
+      if (this.playersAnswers.length > 0 && this.gamePhase == 'answer')
+        if (this.playersAnswers[index]['answerCheck'])
+          return 'trueAnswer'
+        else
+          return 'falseAnswer'
+      else
+        return 'noneAnswer'
     }
   },
   watch: {
     gamePhase(gamePhaseOld, gamePhaseNew) {
-      if (gamePhaseNew == 'question')
-        this.roundCount += 1
+      if (gamePhaseNew == 'question') {
+        this.roundCount += 1;
+        this.in_answer = '';
+      }
 
-      this.timerCount = 0
+      this.timerCount = 0;
+      
       this.timer = setTimeout(() => {
         this.timerCount++;
       }, 1000);
@@ -135,6 +150,15 @@ export default {
 </script>
 
 <style>
+.falseAnswer {
+   background-color: rgb(255, 0, 0);
+}
+.trueAnswer {
+   background-color: rgb(0, 255, 0);
+}
+.noneAnswer {
+  background-color: rgba(2, 0, 109, 0.493);
+}
 .playersBar {
   display: flex;
   width: 100%;
@@ -152,7 +176,7 @@ export default {
   width: 150px;
   border-radius: 15px;
   z-index: 0;
-  background-color: rgba(2, 0, 109, 0.493);
+  /* background-color: rgba(2, 0, 109, 0.493); */
 }
 .playerBarElementAvatar {
   height: 180px;

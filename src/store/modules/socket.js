@@ -42,8 +42,15 @@ export default {
                 dispatch('updateGamePhase', 'answer')
               }
             }
-            else if (message.type == 'newHints') 
+            else if (message.type == 'newHints') {
               dispatch('updateHints', message.hints)
+            }
+            else if (message.type == 'updateAnswers') {
+              dispatch('updatePlayersAnswers', message.data)
+            }
+            else if (message.type == 'returnToLobby') {
+              dispatch('updateState', 'lobby')
+            }
 
         }
     },
